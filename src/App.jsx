@@ -5,10 +5,16 @@ import Modal from 'react-modal';
 import styles from './App.module.css';
 import { getDateFromString } from './utils';
 
+const LOCAL_STORAGE_KEY = 'calorieRecords';
+
 function App() {
   const [records, setRecords] = useState([]);
   const [nextId, setNextId] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  function save() {
+    localStorage.setItem();
+  }
 
   const modalStyles = {
     content: {

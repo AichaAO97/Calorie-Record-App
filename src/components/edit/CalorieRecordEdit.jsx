@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './CalorieRecordEdit.module.css';
 
 function CalorieRecordEdit(props) {
@@ -10,6 +10,12 @@ function CalorieRecordEdit(props) {
   };
 
   const [mealRecord, setMealRecord] = useState(DEFAULT_VALUE);
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  useEffect(() => {
+    console.log('Executing UseEffect...');
+    setIsFormValid(mealRecord.date && mealRecord.content);
+  }, [mealRecord.date, mealRecord.content]);
 
   const onSubmitHandler = (event) => {
     event.preventDefault();
@@ -18,11 +24,6 @@ function CalorieRecordEdit(props) {
   };
 
   const onDateChangeHandler = (event) => {
-    console.log('######################## onDateChangeHandler calorieEdit');
-    console.log({ value: event.target.value });
-    // console.log({ getDateFromString: getDateFromString(event.target.value) });
-    console.log('######################## onDateChangeHandler calorieEdit');
-
     setMealRecord({
       ...mealRecord,
       date: event.target.value,
@@ -94,9 +95,12 @@ function CalorieRecordEdit(props) {
         name="calories"
         id="calories"
         onChange={onCaloriesChangeHandler}
+        min={0}
       />
       <div className={styles.footer}>
-        <button type="submit">Add Record</button>
+        <button type="submit" disabled={!isFormValid}>
+          Add Record
+        </button>
         <button
           className={styles.secondary}
           type="button"

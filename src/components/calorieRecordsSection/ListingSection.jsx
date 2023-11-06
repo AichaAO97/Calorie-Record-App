@@ -8,19 +8,6 @@ function ListingSection(props) {
 
   const dateChangeHandler = (event) => {
     setCurrentDate(getDateFromString(event.target.value));
-
-    console.log('######################### in listing section');
-    console.log({
-      newDate: new Date(event.target.value),
-      valueFromNewDate: new Date(event.target.value)
-        .toISOString()
-        .split('T')[0],
-      getDateFromString: getDateFromString(event.target.value),
-      valueFromGetDateFromString: getDateFromString(event.target.value)
-        .toISOString()
-        .split('T')[0],
-    });
-    console.log('######################### in listing section');
   };
 
   const dateFilter = (record) => {

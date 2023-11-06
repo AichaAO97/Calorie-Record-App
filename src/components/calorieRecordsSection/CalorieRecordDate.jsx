@@ -25,8 +25,6 @@ function CalorieRecordDate(props) {
   const day = props.date.getUTCDate();
   const year = props.date.getUTCFullYear();
 
-  console.log(month);
-
   return (
     <StyledRecordCell>
       <div className={styles['record-date-month']}> {month} </div>
