@@ -30,7 +30,7 @@ function ListingSection(props) {
         value={currentDate.toISOString().split('T')[0]}
         onChange={dateChangeHandler}
       />
-      <RecordList records={allRecords.filter(dateFilter)} />
+      {allRecords && <RecordList records={allRecords.filter(dateFilter)} />}
     </>
   );
 }
