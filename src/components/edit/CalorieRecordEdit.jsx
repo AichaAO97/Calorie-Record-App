@@ -1,90 +1,129 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useReducer, useContext } from 'react';
 import styles from './CalorieRecordEdit.module.css';
+import { AppContext } from '../../AppContext';
+
+const DEFAULT_VALUE = {
+  meal: { value: 'Breakfast', valid: true },
+  content: { value: '', valid: false },
+  calories: { value: 0, valid: true },
+};
+
+function formReducer(state, action) {
+  const { type, key, value } = action;
+  if (type === 'RESET') {
+    return DEFAULT_VALUE;
+  }
+  let valid;
+  switch (key) {
+    case 'content':
+      valid =
+        (value === 'sport' && state.calories.value < 0) ||
+        (value !== 'sport' && state.calories.value >= 0);
+      return {
+        ...state,
+        content: { value, valid: !!value },
+        calories: { ...state.calories, valid },
+      };
+
+    case 'calories':
+      valid =
+        (state.content.value === 'sport' && value < 0) ||
+        (state.content.value !== 'sport' && value >= 0);
+      return {
+        ...state,
+        calories: { value, valid },
+      };
+    default:
+      return {
+        ...state,
+        [key]: { value, valid: !!value },
+      };
+  }
+}
 
 function CalorieRecordEdit(props) {
-  const DEFAULT_VALUE = {
-    date: '',
-    meal: 'Breakfast',
-    content: '',
-    calories: 0,
-  };
-
-  const [mealRecord, setMealRecord] = useState(DEFAULT_VALUE);
-  const [isDateValid, setIsDateValid] = useState(false);
-  const [isContentValid, setIsContentValid] = useState(false);
-  const [isCaloriesValid, setIsCaloriesValid] = useState(true);
   const [isFormValid, setIsFormValid] = useState(false);
+  const {
+    currentDate,
+    isValidDate,
+    currentDateStr,
+    setCurrentDate,
+    totalCalories,
+  } = useContext(AppContext);
+  const [formState, dispachFn] = useReducer(formReducer, DEFAULT_VALUE);
+  const {
+    content: { valid: isContentValid },
+    calories: { valid: isCaloriesValid },
+  } = formState;
 
   useEffect(() => {
-    console.log({
-      isFormValid: isDateValid && isContentValid && isCaloriesValid,
-    });
-    setIsFormValid(isDateValid && isContentValid && isCaloriesValid);
-  }, [isDateValid, isContentValid, isCaloriesValid]);
+    setIsFormValid(isValidDate && isContentValid && isCaloriesValid);
+  }, [isValidDate, isContentValid, isCaloriesValid]);
 
   const onSubmitHandler = (event) => {
     event.preventDefault();
-    props.onFormSubmit(mealRecord);
-    setMealRecord(DEFAULT_VALUE);
+    props.onFormSubmit({
+      date: currentDate,
+      ...Object.keys(formState).reduce((aggr, cur) => {
+        aggr[cur] = formState[cur].value;
+        return aggr;
+      }, {}),
+    });
+    dispachFn({ type: 'RESET' });
   };
 
   const onDateChangeHandler = (event) => {
-    setMealRecord({
-      ...mealRecord,
-      date: event.target.value,
-    });
-    setIsDateValid(!!event.target.value);
+    setCurrentDate(event.target.value);
   };
 
   const onMealChangeHandler = (event) => {
-    setMealRecord({
-      ...mealRecord,
-      meal: event.target.value,
+    dispachFn({
+      type: 'UPDATE_FIELD',
+      key: 'meal',
+      value: event.target.value,
     });
   };
 
   const onContentChangeHandler = (event) => {
-    setMealRecord({
-      ...mealRecord,
-      content: event.target.value,
+    dispachFn({
+      type: 'UPDATE_FIELD',
+      key: 'content',
+      value: event.target.value,
     });
-    setIsContentValid(!!event.target.value);
   };
 
   const onCaloriesChangeHandler = (event) => {
-    setMealRecord({
-      ...mealRecord,
-      calories: event.target.value,
+    dispachFn({
+      type: 'UPDATE_FIELD',
+      key: 'calories',
+      value: event.target.value,
     });
-    setIsCaloriesValid(
-      (event.target.value >= 0 && mealRecord.content !== 'sport') ||
-        (event.target.value < 0 && mealRecord.content === 'sport')
-    );
   };
 
   const onCancelHandler = () => {
-    setMealRecord(DEFAULT_VALUE);
+    dispachFn({ type: 'RESET' });
     props.onCancel();
   };
 
   return (
     <form className={styles.form} onSubmit={onSubmitHandler}>
+      <p className={styles.warning}> You spent {totalCalories}</p>
       <label htmlFor="date">Date: </label>
       <input
         type="date"
-        value={mealRecord.date}
+        value={currentDateStr}
         name="date"
         id="date"
         onChange={onDateChangeHandler}
         className={`${styles['form-input']} ${
-          !isDateValid ? styles.error : ''
+          !isValidDate ? styles.error : ''
         }`}
       />
       <label htmlFor="meal">Meal: </label>
       <select
         name="meal"
         className={styles['form-input']}
-        value={mealRecord.meal}
+        value={formState.meal.value}
         id="meal"
         onChange={onMealChangeHandler}>
         <option value="Breakfast">Breakfast</option>
@@ -95,7 +134,7 @@ function CalorieRecordEdit(props) {
       <label htmlFor="content">Content: </label>
       <input
         type="text"
-        value={mealRecord.content}
+        value={formState.content.value}
         name="content"
         id="content"
         onChange={onContentChangeHandler}
@@ -109,7 +148,7 @@ function CalorieRecordEdit(props) {
           !isCaloriesValid ? styles.error : ''
         }`}
         type="number"
-        value={mealRecord.calories}
+        value={formState.calories.value}
         name="calories"
         id="calories"
         onChange={onCaloriesChangeHandler}

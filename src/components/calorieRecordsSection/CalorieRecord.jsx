@@ -1,17 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 
 import styles from './CalorieRecord.module.css';
 import CalorieRecordDate from './CalorieRecordDate';
 import StyledRecordCell from '../common/StyledRecordCell';
+import { AppContext } from '../../AppContext';
 
 function CalorieRecord(props) {
+  const { setTotalCalories: addCalories } = useContext(AppContext);
   if (props.calories < 0) {
     return null;
   }
 
   useEffect(() => {
     // This is executed when the component is mounted
-    props.addCalories((prevTotal) => prevTotal + +props.calories);
+    addCalories((prevTotal) => prevTotal + +props.calories);
 
     // return a callback that will be executed when the component is cleaned up
     // the clean up happens in two cases:
@@ -22,7 +24,7 @@ function CalorieRecord(props) {
 
     // This is executed when the component is unmounted
     return () => {
-      props.addCalories((prevTotal) => prevTotal - +props.calories);
+      addCalories((prevTotal) => prevTotal - +props.calories);
     };
   }, []);
 

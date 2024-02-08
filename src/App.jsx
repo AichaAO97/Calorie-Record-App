@@ -3,8 +3,7 @@ import ListingSection from './components/calorieRecordsSection/ListingSection';
 import CalorieRecordEdit from './components/edit/CalorieRecordEdit';
 import Modal from 'react-modal';
 import styles from './App.module.css';
-import { getDateFromString } from './utils';
-
+import AppContextProvider from './AppContext';
 const LOCAL_STORAGE_KEY = 'calorieRecords';
 
 function App() {
@@ -67,7 +66,7 @@ function App() {
     const formattedRecord = {
       ...record,
       id: crypto.randomUUID(),
-      date: getDateFromString(record.date),
+      date: record.date,
     };
     setRecords((prevRecord) => [formattedRecord, ...prevRecord]);
     handleCloseModal();
@@ -76,17 +75,20 @@ function App() {
   return (
     <div className="App">
       <h1 className={styles.title}>Calorie Tracker</h1>
-      <Modal
-        isOpen={isModalOpen}
-        onRequestClose={handleCloseModal}
-        contentLabel="Modal"
-        style={modalStyles}>
-        <CalorieRecordEdit
-          onFormSubmit={formSubmitHandler}
-          onCancel={handleCloseModal}
-        />
-      </Modal>
-      <ListingSection allRecords={records} />
+      <AppContextProvider>
+        <Modal
+          isOpen={isModalOpen}
+          onRequestClose={handleCloseModal}
+          contentLabel="Modal"
+          style={modalStyles}>
+          <CalorieRecordEdit
+            onFormSubmit={formSubmitHandler}
+            onCancel={handleCloseModal}
+          />
+        </Modal>
+        <ListingSection allRecords={records} />
+      </AppContextProvider>
+
       <button className={styles['open-modal-btn']} onClick={handleOpenModal}>
         Track food
       </button>
