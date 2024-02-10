@@ -2,6 +2,7 @@ import { useState, useEffect, useReducer, useContext } from 'react';
 import styles from './CalorieRecordEdit.module.css';
 import { AppContext } from '../../AppContext';
 import { useRef } from 'react';
+import FormInput from '../common/FormInput';
 
 const DEFAULT_VALUE = {
   meal: true,
@@ -109,53 +110,45 @@ function CalorieRecordEdit(props) {
   return (
     <form className={styles.form} onSubmit={onSubmitHandler}>
       <p className={styles.warning}> You spent {totalCalories}</p>
-      <label htmlFor="date">Date: </label>
-      <input
+
+      <FormInput
         type="date"
-        value={currentDateStr}
-        name="date"
         id="date"
+        label="Date"
+        isValid={isValidDate}
+        value={currentDateStr}
         onChange={onDateChangeHandler}
-        className={`${styles['form-input']} ${
-          !isValidDate ? styles.error : ''
-        }`}
       />
-      <label htmlFor="meal">Meal: </label>
-      <select
+      <FormInput
+        type="select"
         ref={mealRef}
-        name="meal"
-        className={styles['form-input']}
         id="meal"
-        onBlur={onMealBlurHandler}>
+        label="Meal"
+        onBlur={onMealBlurHandler}
+        isValid>
         <option value="Breakfast">Breakfast</option>
         <option value="Lunch">Lunch</option>
         <option value="Dinner">Dinner</option>
         <option value="Snack">Snack</option>
-      </select>
-      <label htmlFor="content">Content: </label>
-      <input
-        ref={contentRef}
+      </FormInput>
+
+      <FormInput
         type="text"
-        // value={formState.calories.value}
-        name="content"
         id="content"
+        label="Content"
         onBlur={onContentBlurHandler}
-        className={`${styles['form-input']} ${
-          !isContentValid ? styles.error : ''
-        }`}
+        isValid={isContentValid}
+        ref={contentRef}
       />
-      <label htmlFor="calories">Calories: </label>
-      <input
-        ref={caloriesRef}
-        className={`${styles['form-input']} ${
-          !isCaloriesValid ? styles.error : ''
-        }`}
+      <FormInput
         type="number"
-        name="calories"
         id="calories"
+        label="Calories"
         onBlur={onCaloriesBlurHandler}
-        // min={0}
+        isValid={isCaloriesValid}
+        ref={caloriesRef}
       />
+
       <div className={styles.footer}>
         <button type="submit" disabled={!isFormValid}>
           Add Record
