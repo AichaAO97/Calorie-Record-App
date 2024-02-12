@@ -3,6 +3,8 @@ import styles from './CalorieRecordEdit.module.css';
 import { AppContext } from '../../AppContext';
 import { useRef } from 'react';
 import FormInput from '../common/FormInput';
+import Button from '../common/Button';
+import { useCallback } from 'react';
 
 const DEFAULT_VALUE = {
   meal: true,
@@ -103,9 +105,11 @@ function CalorieRecordEdit(props) {
     });
   };
 
-  const onCancelHandler = () => {
-    props.onCancel();
-  };
+  const onCancelHandler = useCallback(() => {
+    if (isFormValid) {
+      props.onCancel();
+    }
+  }, [isFormValid]);
 
   return (
     <form className={styles.form} onSubmit={onSubmitHandler}>
@@ -150,15 +154,12 @@ function CalorieRecordEdit(props) {
       />
 
       <div className={styles.footer}>
-        <button type="submit" disabled={!isFormValid}>
+        <Button variant="primary" disabled={!isFormValid}>
           Add Record
-        </button>
-        <button
-          className={styles.secondary}
-          type="button"
-          onClick={onCancelHandler}>
+        </Button>
+        <Button variant="secondary" type="button" onClick={onCancelHandler}>
           Cancel
-        </button>
+        </Button>
       </div>
     </form>
   );
