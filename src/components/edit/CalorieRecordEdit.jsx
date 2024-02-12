@@ -5,6 +5,7 @@ import { useRef } from 'react';
 import FormInput from '../common/FormInput';
 import Button from '../common/Button';
 import { useCallback } from 'react';
+import { useMemo } from 'react';
 
 const DEFAULT_VALUE = {
   meal: true,
@@ -44,7 +45,6 @@ function formReducer(state, action) {
 }
 
 function CalorieRecordEdit(props) {
-  const [isFormValid, setIsFormValid] = useState(false);
   const {
     currentDate,
     isValidDate,
@@ -52,6 +52,7 @@ function CalorieRecordEdit(props) {
     setCurrentDate,
     totalCalories,
   } = useContext(AppContext);
+
   const [formState, dispachFn] = useReducer(formReducer, DEFAULT_VALUE);
   const { content: isContentValid, calories: isCaloriesValid } = formState;
 
@@ -59,12 +60,15 @@ function CalorieRecordEdit(props) {
   const mealRef = useRef();
   const caloriesRef = useRef();
 
+  const isFormValid = useMemo(() => {
+    return isValidDate && isContentValid && isCaloriesValid;
+  }, [isValidDate, isContentValid, isCaloriesValid]);
+
   useEffect(() => {
     if (!isContentValid) {
       contentRef.current.focus();
     }
-    setIsFormValid(isValidDate && isContentValid && isCaloriesValid);
-  }, [isValidDate, isContentValid, isCaloriesValid]);
+  }, [isContentValid]);
 
   const onDateChangeHandler = (event) => {
     setCurrentDate(event.target.value);
